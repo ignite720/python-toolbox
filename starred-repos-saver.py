@@ -2,18 +2,28 @@ import requests
 import json
 import time
 
+CONFIG_FILENAME = "starred-repos-saver-config.json"
+
 # 1. Read config
 config = dict()
-with open("config.txt", "r") as f:
-	for line in f:
-		key, value = map(str.strip, line.split('=>'))
-		config[key] = value
-
+try:
+	with open(CONFIG_FILENAME, "r") as f:
+		config = json.load(f)
+except FileNotFoundError:
+	config = {
+		'username': '',
+		'password': '',
+		'output_path': 'starred_repos.json',
+	}
+	
+	with open(CONFIG_FILENAME, "w") as f:
+		json.dump(config, f, indent=4)
+	
 username = config['username']
 password = config['password']
 output_path = config['output_path']
 
-api_url = f"https://api.github.com/users/{username}/starred"
+api_url = f"https://api.github.com/users/{config['username']}/starred"
 headers = {"Accept": "application/vnd.github.v3+json"}
 
 # 2. Fetch all pages of starred repositories
@@ -48,7 +58,8 @@ while True:
 		break
 
 # 3. Save the data to a JSON file
-with open(output_path, "w") as f:
-	json.dump(starred_repos, f, indent=2)
+if len(starred_repos) > 0:
+	with open(output_path, "w") as f:
+		json.dump(starred_repos, f, indent=4)
 
-print(f"The list({page - 1} pages, {len(starred_repos)} items) of all starred repositories has been saved as './{output_path}' file.")
+	print(f"The list({page - 1} pages, {len(starred_repos)} items) of all starred repositories has been saved as './{output_path}' file.")
