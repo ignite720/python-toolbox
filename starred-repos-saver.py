@@ -5,17 +5,16 @@ import time
 CONFIG_FILENAME = "starred-repos-saver-config.json"
 
 # 1. Read config
-config = dict()
+config = {
+	'username': '',
+	'password': '',
+	'output_path': 'starred_repos.json',
+}
+
 try:
 	with open(CONFIG_FILENAME, "r") as f:
 		config = json.load(f)
 except FileNotFoundError:
-	config = {
-		'username': '',
-		'password': '',
-		'output_path': 'starred_repos.json',
-	}
-	
 	with open(CONFIG_FILENAME, "w") as f:
 		json.dump(config, f, indent=4)
 	
